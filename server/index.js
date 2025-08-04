@@ -2,6 +2,7 @@ const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
 const todoService = require('./todoService');
+const onboardingService = require('./onboardingService');
 const fs = require('fs');
 const path = require('path');
 
@@ -15,42 +16,63 @@ app.use(express.json());
 const FLOW_PATH = path.join(__dirname, 'onboardingFlow.json');
 const USER_STATE_PATH = path.join(__dirname, 'onboardingUserStates.json');
 
-app.get('/api/onboarding-flow', (req, res) => {
-  fs.readFile(FLOW_PATH, 'utf8', (err, data) => {
-    if (err) return res.status(500).json({ error: 'Failed to read onboarding flow' });
-    res.json(JSON.parse(data));
-  });
+// Fetch flow for an organisation
+app.get('/api/orgs/:orgId/onboarding-flow', async (req, res) => {
+  const { orgId } = req.params;
+  try {
+    const doc = await onboardingService.getFlow(orgId);
+    if (doc) return res.json(doc.flow);
+    const data = await fs.promises.readFile(FLOW_PATH, 'utf8');
+    let flows = {};
+    try { flows = JSON.parse(data); } catch {}
+    const flow = flows[orgId] || null;
+    if (flow) {
+      await onboardingService.saveFlow(orgId, flow);
+    }
+    res.json(flow);
+  } catch (err) {
+    res.status(500).json({ error: 'Failed to load onboarding flow' });
+  }
 });
 
-app.post('/api/onboarding-flow', (req, res) => {
-  fs.writeFile(FLOW_PATH, JSON.stringify(req.body, null, 2), err => {
-    if (err) return res.status(500).json({ error: 'Failed to save onboarding flow' });
+// Save flow for an organisation
+app.post('/api/orgs/:orgId/onboarding-flow', async (req, res) => {
+  const { orgId } = req.params;
+  try {
+    await onboardingService.saveFlow(orgId, req.body);
     res.json({ success: true });
-  });
+  } catch (err) {
+    res.status(500).json({ error: 'Failed to save onboarding flow' });
+  }
 });
 
 // Onboarding User State Endpoints
-app.get('/api/onboarding-user-state/:userId', (req, res) => {
-  fs.readFile(USER_STATE_PATH, 'utf8', (err, data) => {
-    if (err) return res.status(500).json({ error: 'Failed to read user states' });
-    const states = JSON.parse(data);
-    const userState = states[req.params.userId] || null;
-    res.json(userState);
-  });
+app.get('/api/orgs/:orgId/onboarding-user-state/:userId', async (req, res) => {
+  const { orgId, userId } = req.params;
+  try {
+    const doc = await onboardingService.getUserState(orgId, userId);
+    if (doc) return res.json(doc.state);
+    const data = await fs.promises.readFile(USER_STATE_PATH, 'utf8');
+    let states = {};
+    try { states = JSON.parse(data); } catch {}
+    const state = states[orgId]?.[userId] || null;
+    if (state) {
+      await onboardingService.saveUserState(orgId, userId, state);
+    }
+    res.json(state);
+  } catch (err) {
+    res.status(500).json({ error: 'Failed to load user state' });
+  }
 });
 
-app.post('/api/onboarding-user-state/:userId', (req, res) => {
-  fs.readFile(USER_STATE_PATH, 'utf8', (err, data) => {
-    let states = {};
-    if (!err) {
-      try { states = JSON.parse(data); } catch {}
-    }
-    states[req.params.userId] = req.body;
-    fs.writeFile(USER_STATE_PATH, JSON.stringify(states, null, 2), err2 => {
-      if (err2) return res.status(500).json({ error: 'Failed to save user state' });
-      res.json({ success: true });
-    });
-  });
+app.post('/api/orgs/:orgId/onboarding-user-state/:userId', async (req, res) => {
+  const { orgId, userId } = req.params;
+  try {
+    await onboardingService.saveUserState(orgId, userId, req.body);
+    res.json({ success: true });
+  } catch (err) {
+    res.status(500).json({ error: 'Failed to save user state' });
+  }
 });
 
 // Connect to local MongoDB

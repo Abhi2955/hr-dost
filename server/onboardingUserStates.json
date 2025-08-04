@@ -1,11 +1,13 @@
 {
-  "user1": {
-    "userId": "user1",
-    "currentNodeId": "welcome-2",
-    "progress": {
-      "welcome": 50,
-      "policies": 0
-    },
-    "completedNodes": ["welcome-1"]
+  "org1": {
+    "user1": {
+      "userId": "user1",
+      "currentNodeId": "welcome-2",
+      "progress": {
+        "welcome": 50,
+        "policies": 0
+      },
+      "completedNodes": ["welcome-1"]
+    }
   }
-} 
+}

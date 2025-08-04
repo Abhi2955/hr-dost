@@ -1,78 +1,80 @@
 {
-  "id": "onboarding-root",
-  "title": "Onboarding Home",
-  "type": "flow",
-  "children": [
-    {
-      "id": "welcome",
-      "title": "Welcome & Introduction",
-      "type": "flow",
-      "children": [
-        {
-          "id": "welcome-1",
-          "title": "Welcome to Our Team!",
-          "type": "card",
-          "content": "We're excited to have you join us. This onboarding journey will help you get familiar with our company culture, policies, and your new role.",
-          "buttons": [
-            { "label": "Next", "action": "goto", "target": "welcome-2" }
-          ]
-        },
-        {
-          "id": "welcome-2",
-          "title": "What to Expect",
-          "type": "card",
-          "content": "Over the next few modules, you'll learn about our company values, meet your team members, understand our policies, and explore your benefits.",
-          "buttons": [
-            { "label": "Next", "action": "goto", "target": "welcome-3" }
-          ]
-        },
-        {
-          "id": "welcome-3",
-          "title": "Your Success Matters",
-          "type": "card",
-          "content": "We believe that a well-onboarded employee is a successful employee. Take your time with each module, ask questions, and don't hesitate to reach out to your manager or HR team.",
-          "buttons": [
-            { "label": "Next", "action": "goto", "target": "welcome-4" }
-          ]
-        },
-        {
-          "id": "welcome-4",
-          "title": "Ready to Begin?",
-          "type": "card",
-          "content": "You're all set to start your onboarding journey! Click 'Complete Welcome' to move on to the next module and continue your progress.",
-          "buttons": [
-            { "label": "Complete Welcome", "action": "goto", "target": "policies" }
-          ]
+  "org1": {
+    "id": "onboarding-root",
+    "title": "Onboarding Home",
+    "type": "flow",
+    "children": [
+      {
+        "id": "welcome",
+        "title": "Welcome & Introduction",
+        "type": "flow",
+        "children": [
+          {
+            "id": "welcome-1",
+            "title": "Welcome to Our Team!",
+            "type": "card",
+            "content": "We're excited to have you join us. This onboarding journey will help you get familiar with our company culture, policies, and your new role.",
+            "buttons": [
+              { "label": "Next", "action": "goto", "target": "welcome-2" }
+            ]
+          },
+          {
+            "id": "welcome-2",
+            "title": "What to Expect",
+            "type": "card",
+            "content": "Over the next few modules, you'll learn about our company values, meet your team members, understand our policies, and explore your benefits.",
+            "buttons": [
+              { "label": "Next", "action": "goto", "target": "welcome-3" }
+            ]
+          },
+          {
+            "id": "welcome-3",
+            "title": "Your Success Matters",
+            "type": "card",
+            "content": "We believe that a well-onboarded employee is a successful employee. Take your time with each module, ask questions, and don't hesitate to reach out to your manager or HR team.",
+            "buttons": [
+              { "label": "Next", "action": "goto", "target": "welcome-4" }
+            ]
+          },
+          {
+            "id": "welcome-4",
+            "title": "Ready to Begin?",
+            "type": "card",
+            "content": "You're all set to start your onboarding journey! Click 'Complete Welcome' to move on to the next module and continue your progress.",
+            "buttons": [
+              { "label": "Complete Welcome", "action": "goto", "target": "policies" }
+            ]
+          }
+        ],
+        "static": {
+          "whatsComingNext": ["Company Policies", "Meet Your Team"]
         }
-      ],
-      "static": {
-        "whatsComingNext": ["Company Policies", "Meet Your Team"]
+      },
+      {
+        "id": "policies",
+        "title": "Company Policies",
+        "type": "flow",
+        "children": [
+          {
+            "id": "policy-handbook",
+            "title": "Employee Handbook",
+            "type": "card",
+            "content": "Our employee handbook covers all aspects of working at our company, including workplace conduct, dress code, attendance policies, and more.",
+            "buttons": [
+              { "label": "Acknowledge", "action": "acknowledge" }
+            ]
+          },
+          {
+            "id": "policy-code-of-conduct",
+            "title": "Code of Conduct",
+            "type": "card",
+            "content": "Our code of conduct establishes the standards of behavior expected from all employees. This includes professional conduct, conflict of interest policies, confidentiality requirements, and anti-harassment guidelines.",
+            "buttons": [
+              { "label": "Acknowledge", "action": "acknowledge" }
+            ]
+          }
+        ]
       }
-    },
-    {
-      "id": "policies",
-      "title": "Company Policies",
-      "type": "flow",
-      "children": [
-        {
-          "id": "policy-handbook",
-          "title": "Employee Handbook",
-          "type": "card",
-          "content": "Our employee handbook covers all aspects of working at our company, including workplace conduct, dress code, attendance policies, and more.",
-          "buttons": [
-            { "label": "Acknowledge", "action": "acknowledge" }
-          ]
-        },
-        {
-          "id": "policy-code-of-conduct",
-          "title": "Code of Conduct",
-          "type": "card",
-          "content": "Our code of conduct establishes the standards of behavior expected from all employees. This includes professional conduct, conflict of interest policies, confidentiality requirements, and anti-harassment guidelines.",
-          "buttons": [
-            { "label": "Acknowledge", "action": "acknowledge" }
-          ]
-        }
-      ]
-    }
-  ]
-} 
+    ]
+  }
+}
