@@ -24,6 +24,7 @@ interface BaseItem {
   text: string;
   category: ItemCategory;
   createdAt: Date;
+  tags?: string[];
 }
 
 interface TaskItem extends BaseItem {
@@ -65,6 +66,7 @@ const parseDates = (item: any): TodoItem => ({
   comments: item.comments
     ? item.comments.map((c: any) => ({ ...c, createdAt: c.createdAt ? new Date(c.createdAt) : undefined }))
     : [],
+  tags: item.tags || [],
 });
 
 export default function TodoApp() {
@@ -79,9 +81,11 @@ export default function TodoApp() {
   const [newReminderFrequency, setNewReminderFrequency] = useState<RecurrenceFrequency>("monthly");
   const [isRecurring, setIsRecurring] = useState(false);
   const [newItemPriority, setNewItemPriority] = useState<Priority>("medium");
+  const [newItemTags, setNewItemTags] = useState("");
   const [priorityFilter, setPriorityFilter] = useState<Priority | "all">("all");
   const [editingItem, setEditingItem] = useState<(TaskItem | GoalItem & { _id?: string }) | null>(null);
   const [newComment, setNewComment] = useState("");
+  const [tagSearch, setTagSearch] = useState("");
   const [sortOrder, setSortOrder] = useState<{
     task: string;
     goal: string;
@@ -107,11 +111,12 @@ export default function TodoApp() {
 
   const addItem = async () => {
     if (inputValue.trim() === "") return;
-    
+
     const baseItem = {
       text: inputValue.trim(),
       category: activeCategory,
       createdAt: new Date(),
+      tags: newItemTags.split(',').map(t => t.trim()).filter(Boolean),
     };
 
     let newItem: any;
@@ -160,6 +165,7 @@ export default function TodoApp() {
     setInputValue("");
     setNewItemDueDate(undefined);
     setIsRecurring(false);
+    setNewItemTags("");
     const categoryName = activeCategory === "task" ? "task" : activeCategory === "goal" ? "goal" : "reminder";
     toast({
       title: `${categoryName.charAt(0).toUpperCase() + categoryName.slice(1)} added!`,
@@ -214,7 +220,7 @@ export default function TodoApp() {
 
   // Edit dialog logic
   const openEditDialog = (item: any) => {
-    setEditForm({ ...item });
+    setEditForm({ ...item, tags: item.tags ? item.tags.join(', ') : '' });
     setEditDialogOpen(item._id);
   };
   const closeEditDialog = () => {
@@ -227,10 +233,16 @@ export default function TodoApp() {
   const saveEdit = async () => {
     if (!editForm || !editForm._id) return;
     try {
+      const payload = {
+        ...editForm,
+        tags: typeof editForm.tags === 'string'
+          ? editForm.tags.split(',').map((t: string) => t.trim()).filter(Boolean)
+          : editForm.tags,
+      };
       const res = await fetch(`/api/items/${editForm._id}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(editForm),
+        body: JSON.stringify(payload),
       });
       const updated = await res.json();
       setItems(prev => prev.map(i => i._id === updated._id ? parseDates(updated) : i));
@@ -256,8 +268,14 @@ export default function TodoApp() {
     }
     // Apply priority filter
     if (priorityFilter !== "all") {
-      categoryItems = categoryItems.filter(item => 
+      categoryItems = categoryItems.filter(item =>
         (item.category === "task" || item.category === "goal") && item.priority === priorityFilter
+      );
+    }
+    if (tagSearch.trim() !== "") {
+      const regex = new RegExp(tagSearch, 'i');
+      categoryItems = categoryItems.filter(item =>
+        item.tags && item.tags.some(tag => regex.test(tag))
       );
     }
     // Sort
@@ -527,6 +545,15 @@ export default function TodoApp() {
                 <span className="capitalize">{item.recurrence.frequency}</span>
               </div>
             )}
+            {item.tags && item.tags.length > 0 && (
+              <div className="flex items-center gap-1 flex-wrap">
+                {item.tags.map(tag => (
+                  <span key={tag} className="text-xs bg-muted px-2 py-0.5 rounded">
+                    {tag}
+                  </span>
+                ))}
+              </div>
+            )}
             <div className="flex items-center gap-2 ml-auto">
               {(item.category === "task" || item.category === "goal") && (
                 <Dialog open={(editingItem as any)?._id === item._id} onOpenChange={open => { if (!open) closeCommentDialog(); }}>
@@ -758,9 +785,27 @@ export default function TodoApp() {
                   )}
                 </div>
               )}
+              <div className="flex gap-2 items-center">
+                <Label className="text-sm text-muted-foreground">Tags:</Label>
+                <Input
+                  placeholder="tag1, tag2"
+                  value={newItemTags}
+                  onChange={(e) => setNewItemTags(e.target.value)}
+                  className="w-[200px]"
+                />
+              </div>
             </div>
           </div>
         </Card>
+
+        <div className="mb-6">
+          <Input
+            placeholder="Search by tag"
+            value={tagSearch}
+            onChange={(e) => setTagSearch(e.target.value)}
+            className="max-w-xs"
+          />
+        </div>
 
         {renderStats(category)}
         {renderFilterButtons(category)}
@@ -869,6 +914,12 @@ export default function TodoApp() {
           )}
           <Label>Due Date</Label>
           <Input type="date" value={editForm?.dueDate ? (typeof editForm.dueDate === 'string' ? editForm.dueDate.slice(0,10) : editForm.dueDate.toISOString().slice(0,10)) : ""} onChange={e => handleEditChange("dueDate", e.target.value ? new Date(e.target.value) : undefined)} />
+          <Label>Tags</Label>
+          <Input
+            value={editForm?.tags || ""}
+            onChange={e => handleEditChange("tags", e.target.value)}
+            placeholder="tag1, tag2"
+          />
           {editForm?.category === "reminder" && (
             <>
               <Label>Recurring</Label>

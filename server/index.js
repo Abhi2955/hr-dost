@@ -63,7 +63,8 @@ mongoose.connect(dbUrl, { useNewUrlParser: true, useUnifiedTopology: true })
 app.get('/api/items', async (req, res) => {
   try {
     const userId = req.query.userId || 'user1';
-    const items = await todoService.getItems(userId);
+    const tag = req.query.tag;
+    const items = await todoService.getItems(userId, tag);
     res.json(items);
   } catch (err) {
     res.status(500).json({ error: err.message });
