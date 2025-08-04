@@ -918,6 +918,8 @@ export default function TodoApp() {
           <Input
             value={editForm?.tags || ""}
             onChange={e => handleEditChange("tags", e.target.value)}
+            value={editForm?.tags ? editForm.tags.join(", ") : ""}
+            onChange={e => handleEditChange("tags", e.target.value.split(",").map((t: string) => t.trim()).filter(Boolean))}
             placeholder="tag1, tag2"
           />
           {editForm?.category === "reminder" && (
