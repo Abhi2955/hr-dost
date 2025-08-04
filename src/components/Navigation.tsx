@@ -1,12 +1,13 @@
 import { NavLink } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { Home, BarChart3, Settings, Info, GraduationCap } from "lucide-react";
+import { Home, BarChart3, Settings, Info, GraduationCap, KanbanSquare } from "lucide-react";
 
 export default function Navigation() {
   const navItems = [
     { to: "/", icon: Home, label: "Home" },
     { to: "/onboarding", icon: GraduationCap, label: "Onboarding" },
     { to: "/statistics", icon: BarChart3, label: "Statistics" },
+    { to: "/kanban", icon: KanbanSquare, label: "Kanban" },
     { to: "/settings", icon: Settings, label: "Settings" },
     { to: "/about", icon: Info, label: "About" },
   ];
