@@ -1,5 +1,7 @@
 import { useState, useEffect, useCallback } from "react";
 
+const ORG_ID = "org1";
+
 export interface OnboardingUserState {
   userId: string;
   currentNodeId: string;
@@ -14,7 +16,7 @@ export function useOnboardingUserState(userId: string): [OnboardingUserState | n
   // Fetch from backend
   useEffect(() => {
     setLoading(true);
-    fetch(`/api/onboarding-user-state/${userId}`)
+    fetch(`/api/orgs/${ORG_ID}/onboarding-user-state/${userId}`)
       .then(r => r.json())
       .then(data => {
         if (data) setState(data);
@@ -32,7 +34,7 @@ export function useOnboardingUserState(userId: string): [OnboardingUserState | n
     setState(prev => {
       if (!prev) return prev;
       const newState = { ...prev, ...update };
-      fetch(`/api/onboarding-user-state/${userId}`,
+      fetch(`/api/orgs/${ORG_ID}/onboarding-user-state/${userId}`,
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },

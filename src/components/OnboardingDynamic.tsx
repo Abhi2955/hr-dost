@@ -1,5 +1,4 @@
 import { useEffect, useState } from "react";
-import flowJson from "@/lib/onboardingFlow.json";
 import { useOnboardingUserState } from "./OnboardingUserState";
 import { Button } from "@/components/ui/button";
 import Navigation from "@/components/Navigation";
@@ -25,6 +24,8 @@ function findNodeById(node: FlowNode, id: string): FlowNode | null {
   return null;
 }
 
+const ORG_ID = "org1";
+
 export default function OnboardingDynamic({ userId = "user1" }: { userId?: string }) {
   const [flow, setFlow] = useState<FlowNode | null>(null);
   const [flowLoading, setFlowLoading] = useState(true);
@@ -34,7 +35,7 @@ export default function OnboardingDynamic({ userId = "user1" }: { userId?: strin
   // Fetch flow from backend
   useEffect(() => {
     setFlowLoading(true);
-    fetch("/api/onboarding-flow")
+    fetch(`/api/orgs/${ORG_ID}/onboarding-flow`)
       .then(r => r.json())
       .then(data => { setFlow(data); setFlowLoading(false); })
       .catch(() => setFlowLoading(false));

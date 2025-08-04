@@ -1,5 +1,7 @@
 import { useState, useEffect } from "react";
 
+const ORG_ID = "org1";
+
 interface FlowNode {
   id: string;
   title: string;
@@ -51,7 +53,7 @@ export default function OnboardingFlowEditor() {
   // Fetch flow from backend
   useEffect(() => {
     setLoading(true);
-    fetch("/api/onboarding-flow")
+    fetch(`/api/orgs/${ORG_ID}/onboarding-flow`)
       .then(r => r.json())
       .then(data => { setFlow(data); setLoading(false); })
       .catch(e => { setError("Failed to load flow"); setLoading(false); });
@@ -161,7 +163,7 @@ export default function OnboardingFlowEditor() {
   function handleSaveToBackend() {
     if (!flow) return;
     setSaving(true);
-    fetch("/api/onboarding-flow", {
+    fetch(`/api/orgs/${ORG_ID}/onboarding-flow`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(flow)
