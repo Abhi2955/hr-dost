@@ -13,6 +13,7 @@ const itemSchema = new mongoose.Schema({
   priority: String, // for task/goal
   dueDate: Date,
   comments: [commentSchema], // for task/goal
+  tags: [String],
   recurrence: {
     frequency: String,
     isRecurring: Boolean,
@@ -22,8 +23,12 @@ const itemSchema = new mongoose.Schema({
 
 const TodoItem = mongoose.models.TodoItem || mongoose.model('TodoItem', itemSchema);
 
-async function getItems(userId) {
-  return TodoItem.find({ userId }).sort({ createdAt: -1 });
+async function getItems(userId, tag) {
+  const filter = { userId };
+  if (tag) {
+    filter.tags = tag;
+  }
+  return TodoItem.find(filter).sort({ createdAt: -1 });
 }
 
 async function createItem(data) {
