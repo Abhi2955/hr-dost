@@ -3,14 +3,30 @@ import { useOnboardingUserState } from "./OnboardingUserState";
 import { Button } from "@/components/ui/button";
 import Navigation from "@/components/Navigation";
 
+interface ActionDef {
+  id: string;
+  type: string;
+  target?: string;
+  method?: string;
+  headers?: Record<string, string>;
+  dbType?: string;
+  query?: string;
+}
+
+interface ButtonDef {
+  label: string;
+  actionId?: string;
+}
+
 interface FlowNode {
   id: string;
   title: string;
   type: string;
   children?: FlowNode[];
   content?: string;
-  buttons?: { label: string; action: string; target?: string }[];
-  static?: any;
+  actions?: ActionDef[];
+  buttons?: ButtonDef[];
+  static?: unknown;
 }
 
 function findNodeById(node: FlowNode, id: string): FlowNode | null {
@@ -47,13 +63,31 @@ export default function OnboardingDynamic({ userId = "user1" }: { userId?: strin
     setCurrentNode(node);
   }, [userState?.currentNodeId, flow, userState]);
 
-  function handleButtonClick(btn: any) {
-    if (!userState) return;
-    if (btn.action === "goto" && btn.target) {
-      setUserState({ currentNodeId: btn.target });
+  function handleButtonClick(btn: ButtonDef) {
+    if (!userState || !currentNode) return;
+    const action = currentNode.actions?.find(a => a.id === btn.actionId);
+    if (!action) return;
+    if (action.type === "goto" && action.target) {
+      setUserState({ currentNodeId: action.target });
       setUserState({ completedNodes: Array.from(new Set([...(userState.completedNodes || []), userState.currentNodeId])) });
-    } else if (btn.action === "acknowledge") {
+    } else if (action.type === "acknowledge") {
       setUserState({ completedNodes: Array.from(new Set([...(userState.completedNodes || []), userState.currentNodeId])) });
+    } else if (action.type === "download" && action.target) {
+      const link = document.createElement("a");
+      link.href = action.target;
+      link.download = "";
+      link.target = "_blank";
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    } else if (action.type === "api" && action.target) {
+      fetch(action.target, { method: action.method || "GET", headers: action.headers }).catch(() => {});
+    } else if (action.type === "db") {
+      fetch("/api/db", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ type: action.dbType, query: action.query })
+      }).catch(() => {});
     }
   }
 
