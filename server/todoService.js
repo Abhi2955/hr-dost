@@ -26,7 +26,7 @@ const TodoItem = mongoose.models.TodoItem || mongoose.model('TodoItem', itemSche
 async function getItems(userId, tag) {
   const filter = { userId };
   if (tag) {
-    filter.tags = tag;
+    filter.tags = { $regex: tag, $options: 'i' };
   }
   return TodoItem.find(filter).sort({ createdAt: -1 });
 }

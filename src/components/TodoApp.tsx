@@ -220,7 +220,7 @@ export default function TodoApp() {
 
   // Edit dialog logic
   const openEditDialog = (item: any) => {
-    setEditForm({ ...item });
+    setEditForm({ ...item, tags: item.tags ? item.tags.join(', ') : '' });
     setEditDialogOpen(item._id);
   };
   const closeEditDialog = () => {
@@ -233,10 +233,16 @@ export default function TodoApp() {
   const saveEdit = async () => {
     if (!editForm || !editForm._id) return;
     try {
+      const payload = {
+        ...editForm,
+        tags: typeof editForm.tags === 'string'
+          ? editForm.tags.split(',').map((t: string) => t.trim()).filter(Boolean)
+          : editForm.tags,
+      };
       const res = await fetch(`/api/items/${editForm._id}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(editForm),
+        body: JSON.stringify(payload),
       });
       const updated = await res.json();
       setItems(prev => prev.map(i => i._id === updated._id ? parseDates(updated) : i));
@@ -267,9 +273,9 @@ export default function TodoApp() {
       );
     }
     if (tagSearch.trim() !== "") {
-      const search = tagSearch.toLowerCase();
+      const regex = new RegExp(tagSearch, 'i');
       categoryItems = categoryItems.filter(item =>
-        item.tags && item.tags.some(tag => tag.toLowerCase().includes(search))
+        item.tags && item.tags.some(tag => regex.test(tag))
       );
     }
     // Sort
@@ -910,6 +916,8 @@ export default function TodoApp() {
           <Input type="date" value={editForm?.dueDate ? (typeof editForm.dueDate === 'string' ? editForm.dueDate.slice(0,10) : editForm.dueDate.toISOString().slice(0,10)) : ""} onChange={e => handleEditChange("dueDate", e.target.value ? new Date(e.target.value) : undefined)} />
           <Label>Tags</Label>
           <Input
+            value={editForm?.tags || ""}
+            onChange={e => handleEditChange("tags", e.target.value)}
             value={editForm?.tags ? editForm.tags.join(", ") : ""}
             onChange={e => handleEditChange("tags", e.target.value.split(",").map((t: string) => t.trim()).filter(Boolean))}
             placeholder="tag1, tag2"
