@@ -9,18 +9,27 @@ interface TodoItem {
   status?: TodoStatus;
   dueDate?: Date;
   createdAt?: Date;
+  comments?: { text: string; createdAt?: Date }[];
   [key: string]: unknown;
 }
 
-interface RawItem extends Omit<TodoItem, "dueDate" | "createdAt"> {
+interface RawItem
+  extends Omit<TodoItem, "dueDate" | "createdAt" | "comments"> {
   dueDate?: string;
   createdAt?: string;
+  comments?: { text: string; createdAt?: string }[];
 }
 
 const parseDates = (item: RawItem): TodoItem => ({
   ...item,
   createdAt: item.createdAt ? new Date(item.createdAt) : undefined,
   dueDate: item.dueDate ? new Date(item.dueDate) : undefined,
+  comments: item.comments
+    ? item.comments.map(c => ({
+        ...c,
+        createdAt: c.createdAt ? new Date(c.createdAt) : undefined,
+      }))
+    : [],
 });
 
 const KanbanPage = () => {
