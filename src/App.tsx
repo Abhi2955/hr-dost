@@ -17,7 +17,7 @@ import Benefits from "./pages/onboarding/Benefits";
 import Checklist from "./pages/onboarding/Checklist";
 import FlowEditorPage from "./pages/onboarding/FlowEditor";
 import OnboardingDynamicPage from "./pages/onboarding/Dynamic";
-import KanbanPage from "./pages/Kanban";
+import ItemComments from "./pages/ItemComments";
 
 const queryClient = new QueryClient();
 
@@ -41,7 +41,7 @@ const App = () => (
           <Route path="/onboarding/checklist" element={<Checklist />} />
           <Route path="/onboarding/flow-editor" element={<FlowEditorPage />} />
           <Route path="/onboarding/dynamic" element={<OnboardingDynamicPage />} />
-          <Route path="/kanban" element={<KanbanPage />} />
+          <Route path="/items/:id/comments" element={<ItemComments />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>

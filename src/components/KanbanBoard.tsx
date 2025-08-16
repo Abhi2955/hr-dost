@@ -1,7 +1,7 @@
 import { Card } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { useMemo } from "react";
+import { Link } from "react-router-dom";
 
 export type TodoStatus = "todo" | "in-progress" | "completed" | "on-hold";
 export type ItemCategory = "task" | "reminder" | "goal";
@@ -49,7 +49,7 @@ export default function KanbanBoard({ items, onStatusChange }: KanbanBoardProps)
       {groups.map(col => (
         <div
           key={col.key}
-          className="space-y-2 w-72 flex-shrink-0"
+          className="space-y-2 w-72 flex-shrink-0 bg-background/60 p-2 rounded-md shadow"
           onDragOver={e => e.preventDefault()}
           onDrop={e => handleDrop(e, col.key)}
         >
@@ -76,22 +76,14 @@ export default function KanbanBoard({ items, onStatusChange }: KanbanBoardProps)
                   <SelectItem value="completed">Completed</SelectItem>
                 </SelectContent>
               </Select>
-              <Collapsible>
-                <CollapsibleTrigger className="text-xs text-muted-foreground underline">
+              {item._id && (
+                <Link
+                  to={`/items/${item._id}/comments`}
+                  className="text-xs text-muted-foreground underline"
+                >
                   Comments ({item.comments?.length ?? 0})
-                </CollapsibleTrigger>
-                <CollapsibleContent className="mt-1 space-y-1">
-                  {item.comments && item.comments.length > 0 ? (
-                    item.comments.map((c, idx) => (
-                      <div key={idx} className="text-xs text-muted-foreground">
-                        {c.text}
-                      </div>
-                    ))
-                  ) : (
-                    <div className="text-xs text-muted-foreground">No comments</div>
-                  )}
-                </CollapsibleContent>
-              </Collapsible>
+                </Link>
+              )}
             </Card>
           ))}
         </div>
