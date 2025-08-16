@@ -19,12 +19,13 @@ const itemSchema = new mongoose.Schema({
     isRecurring: Boolean,
   }, // for reminder
   createdAt: { type: Date, default: Date.now },
+  deletedAt: { type: Date, default: null },
 });
 
 const TodoItem = mongoose.models.TodoItem || mongoose.model('TodoItem', itemSchema);
 
 async function getItems(userId, tag) {
-  const filter = { userId };
+  const filter = { userId, deletedAt: null };
   if (tag) {
     filter.tags = { $regex: tag, $options: 'i' };
   }
@@ -42,7 +43,7 @@ async function updateItem(id, update) {
 }
 
 async function deleteItem(id) {
-  return TodoItem.findByIdAndDelete(id);
+  return TodoItem.findByIdAndUpdate(id, { deletedAt: new Date() }, { new: true });
 }
 
 async function addComment(id, comment) {
